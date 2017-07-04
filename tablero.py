@@ -27,12 +27,7 @@ def inicializar_tablero():
 
     #Ponemos las fichas iniciales
     tablero[4][4]='X'
-    tablero[4][3]='O'
-    tablero[3][3]='O'
-    tablero[3][4]='O'
-    tablero[3][5]='O'
-    tablero[4][5]='O'
-    tablero[5][5]='O'
+    tablero[5][4]='O'
 
     return tablero
 
