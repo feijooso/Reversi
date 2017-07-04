@@ -55,7 +55,7 @@ def pedir_datos_jugador():
     seguir = True
 
     while seguir:
-        ficha = input("Ingrese que ficha quiere ser, 1) X  2) O: ")
+        ficha = input("Ingrese su ficha (X / O): ")
 
         if ficha == 'X':
             seguir = False
@@ -166,6 +166,54 @@ def puede_reemplazar(tablero,coordenada_x,coordenada_y,ficha):
 
     return jugable_norte or jugable_sur or jugable_suroeste or jugable_sureste or jugable_noroeste or jugable_noreste or jugable_este or jugable_oeste
 
+def jugadas_posibles(tablero,coordenada_x,coordenada_y,ficha):
+    jugadas_posibles = []
+
+    _ , reemplazos_norte = buscar_alrededor(tablero,coordenada_x,coordenada_y,ficha,-1,0)
+    _ , reemplazos_sur = buscar_alrededor(tablero,coordenada_x,coordenada_y,ficha,1,0)
+    _ , reemplazos_este = buscar_alrededor(tablero,coordenada_x,coordenada_y,ficha,0,1)
+    _ , reemplazos_oeste = buscar_alrededor(tablero,coordenada_x,coordenada_y,ficha,0,-1)
+    _ , reemplazos_noreste = buscar_alrededor(tablero,coordenada_x,coordenada_y,ficha,-1,1)
+    _ , reemplazos_noroeste = buscar_alrededor(tablero,coordenada_x,coordenada_y,ficha,-1,-1)
+    _ , reemplazos_sureste = buscar_alrededor(tablero,coordenada_x,coordenada_y,ficha,1,1)
+    _ , reemplazos_suroeste = buscar_alrededor(tablero,coordenada_x,coordenada_y,ficha,1,-1)
+
+    if len(reemplazos_norte)>0:
+        for i in range(1,len(reemplazos_norte)+1):
+            jugadas_posibles.append(reemplazos_norte[i-1])
+
+    if len(reemplazos_sur)>0:
+        for i in range(1,len(reemplazos_sur)+1):
+            jugadas_posibles.append(reemplazos_sur[i-1])
+
+    if len(reemplazos_este)>0:
+        for i in range(1,len(reemplazos_este)+1):
+            jugadas_posibles.append(reemplazos_este[i-1])
+
+    if len(reemplazos_oeste)>0:
+        for i in range(1,len(reemplazos_oeste)+1):
+            jugadas_posibles.append(reemplazos_oeste[i-1])
+
+    if len(reemplazos_noreste)>0:
+        for i in range(1,len(reemplazos_noreste)+1):
+            jugadas_posibles.append(reemplazos_noreste[i-1])
+
+    if len(reemplazos_noroeste)>0:
+        for i in range(1,len(reemplazos_noroeste)+1):
+            jugadas_posibles.append(reemplazos_noroeste[i-1])
+
+    if len(reemplazos_sureste)>0:
+        for i in range(1,len(reemplazos_sureste)+1):
+            jugadas_posibles.append(reemplazos_sureste[i-1])
+
+    if len(reemplazos_suroeste)>0:
+        for i in range(1,len(reemplazos_suroeste)+1):
+            jugadas_posibles.append(reemplazos_suroeste[i-1])
+
+    print('jugadas posibles:',jugadas_posibles)
+
+    return jugadas_posibles
+
 
 def jugada_valida(tablero,ficha,coordenada_x,coordenada_y):
 
@@ -173,7 +221,13 @@ def jugada_valida(tablero,ficha,coordenada_x,coordenada_y):
         if puede_reemplazar(tablero,coordenada_x,coordenada_y,ficha):
             return True
 
+def voltear_fichas(reemplazos,tablero,ficha):
 
+    for i in range (1,len(reemplazos)+1):
+        #print("puto", reemplazos)
+        tablero[reemplazos[i-1][0]][reemplazos[i-1][1]] = ficha
+
+    return tablero
 
 def juega_usuario(tablero,ficha):
     mostrar_tablero(tablero)
@@ -185,15 +239,41 @@ def juega_usuario(tablero,ficha):
 
         coordenadas_validas = coordenada_valida(coordenada_x) and coordenada_valida(coordenada_y) and jugada_valida(tablero,ficha,coordenada_x,coordenada_y)
 
+    reemplazos = jugadas_posibles(tablero,coordenada_x,coordenada_y,ficha)
 
-"""
+    if len(reemplazos)>0:
+        tablero[coordenada_x][coordenada_y]=ficha
+
+    tablero = voltear_fichas(reemplazos,tablero,ficha)
+
+    return tablero
+
+def juega_pc(tablero,ficha):
+    mostrar_tablero(tablero)
+    fichas_reemplazadas= 0
+    mejor_jugada = []
+
+    for i in range (1,9):
+        for j in range (1,9):
+            if jugada_valida(tablero,ficha,i,j):
+                reemplazos = jugadas_posibles(tablero,i,j,ficha)
+                if len(reemplazos)>fichas_reemplazadas:
+                    fichas_reemplazadas = len(reemplazos)
+                    coordenadas = [i,j]
+                    mejor_jugada = reemplazos
+
+    tablero[coordenadas[0]][coordenadas[1]]=ficha
+
+    tablero=voltear_fichas(mejor_jugada,tablero,ficha)
+
+    return tablero
 
 def turno_X(tablero,ficha_pc,ficha_jugador):
 
     if ficha_jugador=='X':
         juega_usuario(tablero,ficha_jugador)
     else:
-        juega_pc(tablero)
+        juega_pc(tablero,ficha_pc)
 
     return tablero
 
@@ -202,7 +282,7 @@ def turno_O(tablero,ficha_pc,ficha_jugador):
     if ficha_jugador=='O':
         juega_usuario(tablero,ficha_jugador)
     else:
-        juega_pc(tablero)
+        juega_pc(tablero,ficha_pc)
 
     return tablero
 
@@ -210,18 +290,18 @@ def jugar(tablero,ficha_pc,ficha_jugador):
 
     while not tablero_completo(tablero) and jugadores_tienen_fichas(tablero):
         tablero = turno_X(tablero, ficha_pc, ficha_jugador)
+        print ('turno x terminado')
         tablero = turno_O(tablero, ficha_pc, ficha_jugador)
-"""
+        print('turno O terminado')
 
 
 
 
 def main():
     tablero = inicializar_tablero()
-    #ficha_jugador, jugador = pedir_datos_jugador()
-    #ficha_pc = inicializar_jugador_pc(ficha_jugador)
-    #jugar()
-    juega_usuario(tablero,'X')
+    ficha_jugador, jugador = pedir_datos_jugador()
+    ficha_pc = inicializar_jugador_pc(ficha_jugador)
+    jugar(tablero,ficha_pc,ficha_jugador)
 
 
 main()
