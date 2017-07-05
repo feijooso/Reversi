@@ -372,10 +372,16 @@ def actualizar_datos(tablero,ficha_jugador,ficha_pc):
 
     if cantidad_fichas(tablero,ficha_jugador)>cantidad_fichas(tablero,ficha_pc):
         partidas_ganadas = 1
+        partidas_perdidas = 0
+        partidas_empatadas = 0
     elif cantidad_fichas(tablero,ficha_jugador)<cantidad_fichas(tablero,ficha_pc):
         partidas_perdidas = 1
+        partidas_ganadas = 0
+        partidas_empatadas = 0
     else:
         partidas_empatadas = 1
+        partidas_ganadas = 0
+        partidas_perdidas = 0
 
     partidas_jugadas = 1
 
@@ -404,10 +410,7 @@ def cargar_archivo(nombre, puntaje, PJ,PG,PP,PE):
 				lista.append(linea)
 			linea = usuarios.readline()
 		lineausuario = [nombre,puntaje,PJ,PG,PP,PE]
-		print(lineausuario)
-		print(lista)
 		lista.append(lineausuario)
-		print(lista)
 	reescribir_archivo(lista)
 
 def juego():
