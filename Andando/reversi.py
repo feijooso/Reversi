@@ -140,7 +140,7 @@ def buscar_alrededor(tablero, coordenada_x, coordenada_y, ficha_propia, i, j):
 
     continuar = True
 
-    while coordenada_x > 0 and coordenada_x < 9 and coordenada_y > 0 and coordenada_y < 9 and continuar:
+    while coordenada_x >= 0 and coordenada_x <= 9 and coordenada_y >= 0 and coordenada_y <= 9 and continuar:
         if tablero[coordenada_x][coordenada_y] == ficha_rival:
             posibles_reemplazos.append([coordenada_x, coordenada_y])
         elif tablero[coordenada_x][coordenada_y] == ficha_propia:
@@ -367,12 +367,60 @@ def jugar(tablero, ficha_pc, ficha_jugador):
     else:
         print("Ganaron las O!")
 
+def actualizar_datos(tablero,ficha_jugador,ficha_pc):
+    puntos = cantidad_fichas(tablero,ficha_jugador)-cantidad_fichas(tablero,ficha_pc)
 
-def main():
-    tablero = inicializar_tablero()
-    ficha_jugador, jugador = pedir_datos_jugador()
-    ficha_pc = inicializar_jugador_pc(ficha_jugador)
-    jugar(tablero, ficha_pc, ficha_jugador)
+    if cantidad_fichas(tablero,ficha_jugador)>cantidad_fichas(tablero,ficha_pc):
+        partidas_ganadas = 1
+    elif cantidad_fichas(tablero,ficha_jugador)<cantidad_fichas(tablero,ficha_pc):
+        partidas_perdidas = 1
+    else:
+        partidas_empatadas = 1
+
+    partidas_jugadas = 1
+
+    return puntos,partidas_jugadas, partidas_ganadas, partidas_perdidas, partidas_empatadas
+
+def reescribir_archivo(lista):
+	with open("usuarios.csv",'w') as usuarios:
+		for i in range(0,len(lista)):
+			usuarios.write(str(lista[i][0])+','+str(lista[i][1])+','+str(lista[i][2])+','+str(lista[i][3])+','+str(lista[i][4])+','+str(lista[i][5]))
 
 
-main()
+
+def cargar_archivo(nombre, puntaje, PJ,PG,PP,PE):
+	with open("usuarios.csv") as usuarios:
+		linea = usuarios.readline()
+		lista=[]
+		while len(linea) > 0:
+			linea = linea.split(',')
+			if linea[0] == nombre:
+				puntaje += int(linea[1])
+				PJ += 1
+				PG += int(linea[3])
+				PP += int(linea[4])
+				PE += int(linea[5])
+			else:
+				lista.append(linea)
+			linea = usuarios.readline()
+		lineausuario = [nombre,puntaje,PJ,PG,PP,PE]
+		print(lineausuario)
+		print(lista)
+		lista.append(lineausuario)
+		print(lista)
+	reescribir_archivo(lista)
+
+def juego():
+
+    continuar = 'S'
+
+    while continuar == 'S' or continuar == 's':
+        tablero = inicializar_tablero()
+        ficha_jugador, jugador = pedir_datos_jugador()
+        ficha_pc = inicializar_jugador_pc(ficha_jugador)
+        jugar(tablero, ficha_pc, ficha_jugador)
+        puntos, partidas_jugadas,partidas_ganadas,partidas_perdidas,partidas_empatadas = actualizar_datos(tablero,ficha_jugador,ficha_pc)
+        cargar_archivo(jugador,puntos,partidas_jugadas,partidas_ganadas,partidas_perdidas,partidas_empatadas)
+        continuar = input('Desea seguir jugando? S/N')
+
+juego()
