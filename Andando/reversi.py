@@ -409,7 +409,7 @@ def cargar_archivo(nombre, puntaje, PJ,PG,PP,PE):
 			else:
 				lista.append(linea)
 			linea = usuarios.readline()
-		lineausuario = [nombre,puntaje,PJ,PG,PP,PE]
+		lineausuario = [nombre,puntaje,PJ,PG,PP,str(PE)+"\n"]
 		lista.append(lineausuario)
 	reescribir_archivo(lista)
 
